@@ -1,0 +1,164 @@
+package com.bmstu.connection.manager.web.portlet;
+
+import java.io.IOException;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
+import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import com.bmstu.connection.manager.core.model.Connection;
+import com.bmstu.connection.manager.core.service.ConnectionLocalService;
+import com.bmstu.connection.manager.web.constants.ConnectionManagerPortletKeys;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+
+/**
+ * 
+ * Connection manager portlet. Can open and close connection.
+ * 
+ * @author Parhomenko
+ */
+@Component(immediate = true, property = { "com.liferay.portlet.display-category=Traccar",
+		"com.liferay.portlet.instanceable=false", "javax.portlet.display-name=Connection Manager",
+		"javax.portlet.init-param.template-path=/", "javax.portlet.init-param.view-template=/view.jsp",
+		"javax.portlet.name=" + ConnectionManagerPortletKeys.ConnectionManager,
+		"javax.portlet.resource-bundle=content.Language",
+		"javax.portlet.security-role-ref=power-user,user" }, service = Portlet.class)
+public class ConnectionManagerPortlet extends MVCPortlet {
+
+	private static final String NAME = "name";
+	private static final String PASSWORD = "password";
+	private static final String EMAIL = "email";
+	private static final String CONNECTION_ID = "connectionId";
+
+	private ConnectionLocalService connectionLocalService;
+
+	/**
+	 * 
+	 * Creates connection.
+	 * 
+	 * @param request
+	 *            - request. Can't be <code>null</code>.
+	 * @param response
+	 *            - response. Can't be <code>null</code>
+	 * 
+	 * @throws PortalException
+	 */
+	public void createConnection(ActionRequest request, ActionResponse response) throws PortalException {
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(Connection.class.getName(), request);
+
+		String email = ParamUtil.getString(request, EMAIL);
+		String password = ParamUtil.getString(request, PASSWORD);
+		String name = ParamUtil.getString(request, NAME);
+
+		try {
+			Connection connection = connectionLocalService.openConnection(serviceContext.getUserId(), false, email,
+					name, password, null, serviceContext);
+			response.setRenderParameter(CONNECTION_ID, String.valueOf(connection.getConnectionId()));
+			SessionMessages.add(request, "Connection created");
+			request.getPortletSession().setAttribute(CONNECTION_ID, connection.getConnectionId());
+		} catch (Exception e) {
+			System.out.println(e);
+			SessionErrors.add(request, e.getClass().getName());
+			PortalUtil.copyRequestParameters(request, response);
+			response.setRenderParameter("mvcPath", "/view.jsp");
+		}
+	}
+
+	/**
+	 * 
+	 * Opens connection.
+	 * 
+	 * @param request
+	 *            - request. Can't be <code>null</code>.
+	 * @param response
+	 *            - response. Can't be <code>null</code>
+	 * 
+	 * @throws PortalException
+	 */
+	public void createConnection(ActionRequest request, ActionResponse response) throws PortalException {
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(Connection.class.getName(), request);
+
+		String email = ParamUtil.getString(request, EMAIL);
+		String password = ParamUtil.getString(request, PASSWORD);
+		String name = ParamUtil.getString(request, NAME);
+
+		try {
+			Connection connection = connectionLocalService.openConnection(serviceContext.getUserId(), false, email,
+					name, password, null, serviceContext);
+			response.setRenderParameter(CONNECTION_ID, String.valueOf(connection.getConnectionId()));
+			SessionMessages.add(request, "Connection created");
+			request.getPortletSession().setAttribute(CONNECTION_ID, connection.getConnectionId());
+		} catch (Exception e) {
+			System.out.println(e);
+			SessionErrors.add(request, e.getClass().getName());
+			PortalUtil.copyRequestParameters(request, response);
+			response.setRenderParameter("mvcPath", "/view.jsp");
+		}
+	}
+	
+	/**
+	 * 
+	 * Closes connection.
+	 * 
+	 * @param request
+	 *            - request. Can't be <code>null</code>.
+	 * @param response
+	 *            - response. Can't be <code>null</code>
+	 * 
+	 * @throws PortalException
+	 */
+	public void closeConnection(ActionRequest request, ActionResponse response) throws PortalException {
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(Connection.class.getName(), request);
+
+		long connectionId = ParamUtil.getLong(request, CONNECTION_ID);
+		
+		try {
+			connectionLocalService.closeConnection(connectionId, serviceContext);
+			SessionMessages.add(request, "Connection closed");
+			request.getPortletSession().removeAttribute(CONNECTION_ID);
+		} catch (Exception e) {
+			System.out.println(e);
+			SessionErrors.add(request, e.getClass().getName());
+			PortalUtil.copyRequestParameters(request, response);
+			response.setRenderParameter("mvcPath", "/connected.jsp");
+		}
+	}
+	
+	@Override
+	protected String getPath(PortletRequest portletRequest, PortletResponse portletResponse) {
+		if (portletRequest.getPortletSession().getAttribute(CONNECTION_ID) != null)
+		{
+			return "/connected.jsp";
+		}
+		else
+		{
+			return super.getPath(portletRequest, portletResponse);
+		}
+	}
+
+	/**
+	 * 
+	 * Binds connection service.
+	 * 
+	 */
+	@Reference(unbind = "-")
+	protected void bindConnectionService(ConnectionLocalService connectionLocalService) {
+		this.connectionLocalService = connectionLocalService;
+	}
+
+}

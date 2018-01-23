@@ -1,0 +1,9 @@
+Bundle-Name: com.bmstu.connection.manager.core-api
+Bundle-SymbolicName: com.bmstu.connection.manager.core.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	com.bmstu.connection.manager.core.exception,\
+	com.bmstu.connection.manager.core.model,\
+	com.bmstu.connection.manager.core.service,\
+	com.bmstu.connection.manager.core.service.persistence
+-includeresource: META-INF/service.xml=../com.bmstu.connection.manager.core-service/service.xml

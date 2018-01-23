@@ -1,0 +1,9 @@
+#
+#Sun Jan 21 23:22:29 MSK 2018
+linkedResources=
+managedNatures=
+classpath=<?xml version\="1.0" encoding\="UTF-8"?>\n<classpath>\n</classpath>\n
+subprojectPaths=modules\:modules/com.bmstu.connection.manager.core\:modules/com.bmstu.connection.manager.web\:modules/com.bmstu.connection.manager.core/com.bmstu.connection.manager.core-api\:modules/com.bmstu.connection.manager.core/com.bmstu.connection.manager.core-service
+derivedResources=.gradle\:build\:modules/build\:modules/com.bmstu.connection.manager.core/build\:modules/com.bmstu.connection.manager.web/build\:modules/com.bmstu.connection.manager.core/com.bmstu.connection.manager.core-api/build\:modules/com.bmstu.connection.manager.core/com.bmstu.connection.manager.core-service/build
+managedBuilders=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><commands/>
+buildDir=build
